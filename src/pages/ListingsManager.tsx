@@ -1,12 +1,15 @@
+import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, RefreshCw, Sparkles, Building2 } from 'lucide-react';
+import { Upload, RefreshCw, Sparkles, Building2, Plus, Pencil } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { fakeApiCall } from '@/lib/mockData';
 import { toast } from 'sonner';
+import { ListingFormDialog } from '@/components/ListingFormDialog';
+import { Listing } from '@/store/useStore';
 
 const statusColors = {
   synced: 'bg-success text-success-foreground',
@@ -15,7 +18,9 @@ const statusColors = {
 };
 
 export default function ListingsManager() {
-  const { listings, selectedListing, setSelectedListing } = useStore();
+  const { listings, selectedListing, setSelectedListing, addListing, updateListing } = useStore();
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const handlePostEverywhere = async () => {
     await fakeApiCall('/listings/post-all', { listingId: selectedListing?.id });
@@ -32,12 +37,28 @@ export default function ListingsManager() {
     toast.success('AI improvements applied');
   };
 
+  const handleAddListing = async (listing: Partial<Listing>) => {
+    await fakeApiCall('/listings/create', listing);
+    addListing(listing);
+  };
+
+  const handleUpdateListing = async (listing: Partial<Listing>) => {
+    await fakeApiCall('/listings/update', listing);
+    updateListing(listing);
+  };
+
   return (
     <AppLayout title="Listings Manager">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Listings Table */}
         <Card className="lg:col-span-2 p-6">
-          <h3 className="text-lg font-semibold text-foreground mb-4">Your Listings</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-foreground">Your Listings</h3>
+            <Button onClick={() => setIsAddDialogOpen(true)} size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Listing
+            </Button>
+          </div>
           <div className="space-y-3">
             {listings.map((listing) => (
               <div
@@ -88,6 +109,9 @@ export default function ListingsManager() {
                 </Button>
                 <Button onClick={handleSyncListing} variant="outline" size="sm">
                   <RefreshCw className="h-4 w-4" />
+                </Button>
+                <Button onClick={() => setIsEditDialogOpen(true)} variant="outline" size="sm">
+                  <Pencil className="h-4 w-4" />
                 </Button>
               </div>
               
@@ -154,6 +178,19 @@ export default function ListingsManager() {
           )}
         </Card>
       </div>
+
+      <ListingFormDialog
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+        onSave={handleAddListing}
+      />
+
+      <ListingFormDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        listing={selectedListing}
+        onSave={handleUpdateListing}
+      />
     </AppLayout>
   );
 }

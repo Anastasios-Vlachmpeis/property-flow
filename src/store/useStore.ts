@@ -77,6 +77,8 @@ interface Store {
 
   listings: Listing[];
   setListings: (listings: Listing[]) => void;
+  addListing: (listing: Partial<Listing>) => void;
+  updateListing: (listing: Partial<Listing>) => void;
 
   chats: Chat[];
   setChats: (chats: Chat[]) => void;
@@ -110,6 +112,24 @@ export const useStore = create<Store>((set) => ({
 
   listings: [],
   setListings: (listings) => set({ listings }),
+  addListing: (listing) => set((state) => ({
+    listings: [
+      ...state.listings,
+      {
+        ...listing,
+        id: `listing-${Date.now()}`,
+        syncStatus: 'pending' as const,
+      } as Listing,
+    ],
+  })),
+  updateListing: (listing) => set((state) => ({
+    listings: state.listings.map((l) => 
+      l.id === listing.id ? { ...l, ...listing } : l
+    ),
+    selectedListing: state.selectedListing?.id === listing.id 
+      ? { ...state.selectedListing, ...listing } 
+      : state.selectedListing,
+  })),
 
   chats: [],
   setChats: (chats) => set({ chats }),
