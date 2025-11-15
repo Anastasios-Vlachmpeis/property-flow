@@ -38,9 +38,12 @@ export default function Dashboard() {
       listing.availability.forEach((a) => {
         if (!a.bookedBy) return;
         const d = parseISO(a.date);
-        const price = a.bookedBy === 'airbnb' ? listing.airbnbPrice :
+        const basePrice = a.bookedBy === 'airbnb' ? listing.airbnbPrice :
                       a.bookedBy === 'booking' ? listing.bookingPrice :
                       listing.vrboPrice;
+        const price = basePrice && basePrice > 0 
+          ? basePrice 
+          : (a.bookedBy === 'airbnb' ? 150 : a.bookedBy === 'booking' ? 140 : 130);
         if (d >= firstDayThisMonth && d <= today) thisMonthRevenue += price;
         else if (d >= firstDayLastMonth && d <= lastDayLastMonth) lastMonthRevenue += price;
       });
