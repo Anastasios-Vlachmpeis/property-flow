@@ -273,7 +273,7 @@ export default function ListingsManager() {
                 <span>Vrbo</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-foreground/80"></div>
+                <div className="w-3 h-3 rounded bg-black dark:bg-gray-700"></div>
                 <span>Past Booking</span>
               </div>
               <div className="flex items-center gap-2">
@@ -316,7 +316,7 @@ export default function ListingsManager() {
                   }
                 }}
                 modifiersClassNames={{
-                  pastBooking: 'bg-foreground/80 text-background hover:bg-foreground/70',
+                  pastBooking: 'bg-black dark:bg-gray-700 text-white hover:bg-black/80 dark:hover:bg-gray-600',
                   airbnb: 'bg-[#FF385C] text-white hover:bg-[#FF385C]/90',
                   booking: 'bg-[#003580] text-white hover:bg-[#003580]/90',
                   vrbo: 'bg-[#FFB400] text-black hover:bg-[#FFB400]/90',
