@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import ListingsManager from "./pages/ListingsManager";
 import PricingIntelligence from "./pages/PricingIntelligence";
-import MessagingHub from "./pages/MessagingHub";
+import GuestHub from "./pages/GuestHub";
 import Auth from "./pages/Auth";
 import OperationsCleaning from "./pages/OperationsCleaning";
 import OperationsOffboarding from "./pages/OperationsOffboarding";
@@ -26,7 +26,7 @@ const App = () => (
           <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/listings" element={<ProtectedRoute><ListingsManager /></ProtectedRoute>} />
           <Route path="/pricing" element={<ProtectedRoute><PricingIntelligence /></ProtectedRoute>} />
-          <Route path="/messaging" element={<ProtectedRoute><MessagingHub /></ProtectedRoute>} />
+          <Route path="/guest-hub" element={<ProtectedRoute><GuestHub /></ProtectedRoute>} />
           
           <Route path="/operations/cleaning" element={<ProtectedRoute><OperationsCleaning /></ProtectedRoute>} />
           <Route path="/operations/offboarding" element={<ProtectedRoute><OperationsOffboarding /></ProtectedRoute>} />

@@ -1,4 +1,4 @@
-import { Home, Building2, DollarSign, MessageSquare, Settings, ChevronRight } from 'lucide-react';
+import { Home, Building2, DollarSign, Users, Settings, ChevronRight } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
@@ -7,7 +7,7 @@ const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },
   { name: 'Listings Manager', href: '/listings', icon: Building2 },
   { name: 'Pricing Intelligence', href: '/pricing', icon: DollarSign },
-  { name: 'Messaging Hub', href: '/messaging', icon: MessageSquare },
+  { name: 'Guest Hub', href: '/guest-hub', icon: Users },
   {
     name: 'Operations',
     icon: Settings,

@@ -27,6 +27,23 @@ export interface Chat {
   messages: { text: string; sender: 'guest' | 'host'; timestamp: string }[];
 }
 
+export interface BookingRequest {
+  id: string;
+  guestName: string;
+  platform: 'airbnb' | 'booking' | 'vrbo';
+  guests: number;
+  checkIn: string;
+  checkOut: string;
+  status: 'pending' | 'approved' | 'declined';
+  propertyTitle: string;
+  totalPrice: number;
+  platformSpecific?: {
+    geniusLevel?: number; // Booking.com
+    guestRating?: number; // Airbnb
+    verified?: boolean; // VRBO
+  };
+}
+
 export interface PricingData {
   competitors: {
     name: string;
@@ -86,6 +103,9 @@ interface Store {
   chats: Chat[];
   setChats: (chats: Chat[]) => void;
 
+  bookingRequests: BookingRequest[];
+  setBookingRequests: (requests: BookingRequest[]) => void;
+
   pricingData: PricingData | null;
   setPricingData: (data: PricingData) => void;
 
@@ -136,6 +156,9 @@ export const useStore = create<Store>((set) => ({
 
   chats: [],
   setChats: (chats) => set({ chats }),
+
+  bookingRequests: [],
+  setBookingRequests: (requests) => set({ bookingRequests: requests }),
 
   pricingData: null,
   setPricingData: (data) => set({ pricingData: data }),
