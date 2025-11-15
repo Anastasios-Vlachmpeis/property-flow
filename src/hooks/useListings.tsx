@@ -32,6 +32,7 @@ export const useListings = () => {
         syncStatus: listing.sync_status as 'synced' | 'pending' | 'error',
         lastSync: listing.last_sync || undefined,
         amenities: listing.amenities || [],
+        availability: (listing.availability as any) || [],
       }));
 
       setListings(formattedListings);
@@ -96,6 +97,7 @@ export const useListings = () => {
           vrbo_price: updates.vrboPrice,
           photos: updates.photos,
           thumbnail: updates.thumbnail || updates.photos?.[0],
+          availability: updates.availability as any,
         })
         .eq('id', id);
 
