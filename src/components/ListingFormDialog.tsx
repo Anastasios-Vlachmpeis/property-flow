@@ -38,6 +38,23 @@ export function ListingFormDialog({ open, onOpenChange, listing, onSave }: Listi
 
   const [newAmenity, setNewAmenity] = useState('');
 
+  const commonAmenities = [
+    'WiFi', 'Kitchen', 'Washer', 'Dryer', 'Air conditioning', 
+    'Heating', 'TV', 'Pool', 'Hot tub', 'Free parking',
+    'Gym', 'Elevator', 'Pet friendly', 'Workspace'
+  ];
+
+  const toggleCommonAmenity = (amenity: string) => {
+    if (formData.amenities.includes(amenity)) {
+      handleRemoveAmenity(amenity);
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        amenities: [...prev.amenities, amenity]
+      }));
+    }
+  };
+
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
@@ -271,19 +288,41 @@ export function ListingFormDialog({ open, onOpenChange, listing, onSave }: Listi
               <Input
                 value={newAmenity}
                 onChange={(e) => setNewAmenity(e.target.value)}
-                placeholder="Add amenity..."
+                placeholder="Add custom amenity..."
                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddAmenity())}
               />
               <Button type="button" onClick={handleAddAmenity} variant="secondary">Add</Button>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {formData.amenities.map((amenity) => (
-                <Badge key={amenity} variant="secondary" className="gap-1">
-                  {amenity}
-                  <X className="h-3 w-3 cursor-pointer" onClick={() => handleRemoveAmenity(amenity)} />
-                </Badge>
-              ))}
+            
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Common amenities (click to add/remove):</p>
+              <div className="flex flex-wrap gap-2">
+                {commonAmenities.map((amenity) => (
+                  <Badge
+                    key={amenity}
+                    variant={formData.amenities.includes(amenity) ? "default" : "outline"}
+                    className="cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => toggleCommonAmenity(amenity)}
+                  >
+                    {amenity}
+                  </Badge>
+                ))}
+              </div>
             </div>
+
+            {formData.amenities.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">Selected amenities:</p>
+                <div className="flex flex-wrap gap-2">
+                  {formData.amenities.map((amenity) => (
+                    <Badge key={amenity} variant="secondary" className="gap-1">
+                      {amenity}
+                      <X className="h-3 w-3 cursor-pointer" onClick={() => handleRemoveAmenity(amenity)} />
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Platforms & Pricing */}
