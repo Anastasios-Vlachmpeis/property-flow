@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar } from '@/components/ui/calendar';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Upload, RefreshCw, Sparkles, Building2, Plus, Pencil, ArrowRight } from 'lucide-react';
 import { useListings } from '@/hooks/useListings';
 import { useStore } from '@/store/useStore';
@@ -14,12 +15,6 @@ import { toast } from 'sonner';
 import { ListingFormDialog } from '@/components/ListingFormDialog';
 import { Listing } from '@/store/useStore';
 import { format } from 'date-fns';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 
 const statusColors = {
   synced: 'bg-success text-success-foreground',
@@ -170,6 +165,15 @@ export default function ListingsManager() {
     return selectedListing.availability.find(a => a.date === dateStr);
   };
 
+  const getPlatformName = (platform: string) => {
+    switch(platform) {
+      case 'airbnb': return 'Airbnb';
+      case 'booking': return 'Booking.com';
+      case 'vrbo': return 'Vrbo';
+      default: return platform;
+    }
+  };
+
   const getTooltipContent = (date: Date) => {
     const status = getDateStatus(date);
     if (!status) return null;
@@ -179,13 +183,11 @@ export default function ListingsManager() {
     }
 
     if (status.bookedBy && status.guestName) {
-      const platformName = status.bookedBy === 'airbnb' ? 'Airbnb' : 
-                          status.bookedBy === 'booking' ? 'Booking.com' : 'Vrbo';
       return (
         <div className="text-xs space-y-1">
-          <div className="font-semibold">{status.guestName}</div>
-          <div className="text-muted-foreground">{platformName}</div>
-          <div className="text-muted-foreground">{status.guests} guests</div>
+          <div className="font-semibold">{getPlatformName(status.bookedBy)}</div>
+          <div className="text-muted-foreground">Guest: {status.guestName}</div>
+          {status.guests && <div className="text-muted-foreground">{status.guests} guest{status.guests > 1 ? 's' : ''}</div>}
           <div className="text-muted-foreground">Check-in: {status.checkIn}</div>
           <div className="text-muted-foreground">Check-out: {status.checkOut}</div>
         </div>
