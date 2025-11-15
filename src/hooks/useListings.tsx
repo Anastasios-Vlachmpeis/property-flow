@@ -20,6 +20,7 @@ export const useListings = () => {
         id: listing.id,
         title: listing.title,
         location: listing.location,
+        description: listing.description || '',
         thumbnail: listing.thumbnail || listing.photos?.[0] || '/placeholder.svg',
         photos: listing.photos || [],
         maxGuests: listing.max_guests || 2,
@@ -30,6 +31,7 @@ export const useListings = () => {
         vrboPrice: Number(listing.vrbo_price),
         syncStatus: listing.sync_status as 'synced' | 'pending' | 'error',
         lastSync: listing.last_sync || undefined,
+        amenities: [],
       }));
 
       setListings(formattedListings);
@@ -51,6 +53,7 @@ export const useListings = () => {
           user_id: user.id,
           title: listing.title,
           location: listing.location,
+          description: listing.description || '',
           max_guests: listing.maxGuests,
           bedrooms: listing.bedrooms,
           beds: listing.beds,
@@ -82,6 +85,7 @@ export const useListings = () => {
         .update({
           title: updates.title,
           location: updates.location,
+          description: updates.description,
           max_guests: updates.maxGuests,
           bedrooms: updates.bedrooms,
           beds: updates.beds,

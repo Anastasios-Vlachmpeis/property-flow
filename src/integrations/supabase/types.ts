@@ -21,6 +21,7 @@ export type Database = {
           beds: number
           booking_price: number
           created_at: string
+          description: string | null
           id: string
           last_sync: string | null
           location: string
@@ -39,6 +40,7 @@ export type Database = {
           beds?: number
           booking_price?: number
           created_at?: string
+          description?: string | null
           id?: string
           last_sync?: string | null
           location: string
@@ -57,6 +59,7 @@ export type Database = {
           beds?: number
           booking_price?: number
           created_at?: string
+          description?: string | null
           id?: string
           last_sync?: string | null
           location?: string
