@@ -15,11 +15,15 @@ export interface Listing {
   description?: string;
   amenities?: string[];
   photos?: string[];
-  availability?: { 
-    date: string; 
+  availability?: {
+    date: string;
     available: boolean;
     bookedBy?: 'airbnb' | 'booking' | 'vrbo';
     blocked?: boolean;
+    guestName?: string;
+    checkIn?: string;
+    checkOut?: string;
+    guests?: number;
   }[];
 }
 
