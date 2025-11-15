@@ -121,8 +121,7 @@ export default function ListingsManager() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Listings Table */}
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
@@ -171,6 +170,7 @@ export default function ListingsManager() {
           </div>
         </Card>
 
+        <div className="space-y-6">
         {/* Availability Calendar */}
         {selectedListing && (
           <Card className="p-6">
@@ -229,7 +229,6 @@ export default function ListingsManager() {
             </p>
           </Card>
         )}
-        </div>
 
         {/* Detail Panel */}
         <Card className="p-6">
@@ -364,6 +363,7 @@ export default function ListingsManager() {
             </div>
           )}
         </Card>
+        </div>
         </div>
       )}
 
