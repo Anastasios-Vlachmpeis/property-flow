@@ -273,7 +273,7 @@ export default function ListingsManager() {
                 airbnb: 'bg-[#FF385C] text-white hover:bg-[#FF385C]/90',
                 booking: 'bg-[#003580] text-white hover:bg-[#003580]/90',
                 vrbo: 'bg-[#FFB400] text-black hover:bg-[#FFB400]/90',
-                blocked: 'line-through bg-muted text-muted-foreground hover:bg-muted/80',
+                blocked: 'relative bg-muted text-muted-foreground hover:bg-muted/80 after:content-[""] after:absolute after:left-0 after:top-1/2 after:w-full after:h-[2px] after:bg-destructive after:-translate-y-1/2',
                 rangeStart: 'ring-2 ring-primary ring-offset-2'
               }}
               onDayClick={handleDateClick}
