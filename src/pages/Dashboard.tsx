@@ -21,26 +21,47 @@ export default function Dashboard() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    let upcomingBookings = 0;
+    const upcomingBookingsSet = new Set<string>();
     let pastRevenue = 0;
     const activities: Array<{ id: string; message: string; timestamp: string; }> = [];
     
     listings.forEach((listing) => {
       if (!listing.availability) return;
       
+      // Group bookings by guest and platform to count unique reservations
+      const bookingGroups = new Map<string, any>();
+      
       listing.availability.forEach((availability) => {
-        const date = parseISO(availability.date);
+        if (!availability.bookedBy || !availability.guestName) return;
         
-        if (availability.bookedBy) {
-          if (isAfter(date, today) || format(date, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd')) {
-            upcomingBookings++;
-          } else if (availability.isPast) {
-            // Calculate revenue from past bookings
-            const price = availability.bookedBy === 'airbnb' ? listing.airbnbPrice :
-                         availability.bookedBy === 'booking' ? listing.bookingPrice :
-                         listing.vrboPrice;
-            pastRevenue += price;
-          }
+        const key = `${listing.id}-${availability.guestName}-${availability.bookedBy}`;
+        
+        if (!bookingGroups.has(key)) {
+          bookingGroups.set(key, {
+            dates: [availability.date],
+            isPast: availability.isPast,
+            bookedBy: availability.bookedBy,
+            guestName: availability.guestName
+          });
+        } else {
+          bookingGroups.get(key).dates.push(availability.date);
+        }
+      });
+
+      // Count unique upcoming bookings and calculate past revenue
+      bookingGroups.forEach((booking, key) => {
+        const sortedDates = booking.dates.sort();
+        const lastDate = parseISO(sortedDates[sortedDates.length - 1]);
+        
+        if (booking.isPast) {
+          // Calculate revenue from past bookings (per night)
+          const price = booking.bookedBy === 'airbnb' ? listing.airbnbPrice :
+                       booking.bookedBy === 'booking' ? listing.bookingPrice :
+                       listing.vrboPrice;
+          pastRevenue += price * booking.dates.length;
+        } else if (isAfter(lastDate, today) || format(lastDate, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd')) {
+          // Count as upcoming booking
+          upcomingBookingsSet.add(key);
         }
       });
     });
@@ -82,7 +103,7 @@ export default function Dashboard() {
 
     return {
       totalListings: listings.length,
-      upcomingBookings,
+      upcomingBookings: upcomingBookingsSet.size,
       revenue: pastRevenue,
       activities: activities.slice(0, 10)
     };
