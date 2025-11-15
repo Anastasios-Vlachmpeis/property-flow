@@ -57,11 +57,23 @@ export default function Integrations() {
   const [integrations, setIntegrations] = useState<Integration[]>(initialIntegrations);
   const [selectedIntegration, setSelectedIntegration] = useState<Integration | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [apiKey, setApiKey] = useState('');
   const [apiSecret, setApiSecret] = useState('');
 
   const handleConnect = (integration: Integration) => {
     setSelectedIntegration(integration);
+    setIsEditMode(integration.connected);
+    
+    // Pre-fill with masked values if already connected
+    if (integration.connected) {
+      setApiKey('*************');
+      setApiSecret('*************');
+    } else {
+      setApiKey('');
+      setApiSecret('');
+    }
+    
     setIsDialogOpen(true);
   };
 
@@ -79,8 +91,20 @@ export default function Integrations() {
   const handleSaveConnection = () => {
     if (!selectedIntegration) return;
 
+    // Check if fields are empty or unchanged masked values
     if (!apiKey || !apiSecret) {
       toast.error('Please fill in all required fields');
+      return;
+    }
+
+    // If in edit mode and values are still masked, just close dialog
+    if (isEditMode && apiKey === '*************' && apiSecret === '*************') {
+      toast.success(`${selectedIntegration.name} settings unchanged`);
+      setIsDialogOpen(false);
+      setApiKey('');
+      setApiSecret('');
+      setSelectedIntegration(null);
+      setIsEditMode(false);
       return;
     }
 
@@ -92,11 +116,12 @@ export default function Integrations() {
       )
     );
 
-    toast.success(`${selectedIntegration.name} connected successfully`);
+    toast.success(`${selectedIntegration.name} ${isEditMode ? 'updated' : 'connected'} successfully`);
     setIsDialogOpen(false);
     setApiKey('');
     setApiSecret('');
     setSelectedIntegration(null);
+    setIsEditMode(false);
   };
 
   return (
@@ -234,10 +259,13 @@ export default function Integrations() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              Connect {selectedIntegration?.name}
+              {isEditMode ? 'Settings' : 'Connect'} - {selectedIntegration?.name}
             </DialogTitle>
             <DialogDescription>
-              Enter your API credentials to connect your {selectedIntegration?.name} account
+              {isEditMode 
+                ? `Update your ${selectedIntegration?.name} API credentials`
+                : `Enter your API credentials to connect your ${selectedIntegration?.name} account`
+              }
             </DialogDescription>
           </DialogHeader>
 
@@ -261,17 +289,27 @@ export default function Integrations() {
                 onChange={(e) => setApiSecret(e.target.value)}
               />
             </div>
+            {isEditMode && (
+              <p className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
+                Current credentials are hidden for security. Enter new values to update.
+              </p>
+            )}
             <p className="text-xs text-muted-foreground">
               You can find your API credentials in your {selectedIntegration?.name} account settings
             </p>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button variant="outline" onClick={() => {
+              setIsDialogOpen(false);
+              setApiKey('');
+              setApiSecret('');
+              setIsEditMode(false);
+            }}>
               Cancel
             </Button>
             <Button onClick={handleSaveConnection}>
-              Connect
+              {isEditMode ? 'Update' : 'Connect'}
             </Button>
           </DialogFooter>
         </DialogContent>
