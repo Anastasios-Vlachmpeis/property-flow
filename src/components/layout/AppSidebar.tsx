@@ -12,7 +12,6 @@ const navigation = [
     name: 'Operations',
     icon: Settings,
     children: [
-      { name: 'Onboarding', href: '/operations/onboarding' },
       { name: 'Cleaning', href: '/operations/cleaning' },
       { name: 'Offboarding', href: '/operations/offboarding' },
     ],

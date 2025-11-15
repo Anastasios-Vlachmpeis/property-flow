@@ -7,7 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import ListingsManager from "./pages/ListingsManager";
 import PricingIntelligence from "./pages/PricingIntelligence";
 import MessagingHub from "./pages/MessagingHub";
-import OperationsOnboarding from "./pages/OperationsOnboarding";
+
 import OperationsCleaning from "./pages/OperationsCleaning";
 import OperationsOffboarding from "./pages/OperationsOffboarding";
 import NotFound from "./pages/NotFound";
@@ -25,7 +25,7 @@ const App = () => (
           <Route path="/listings" element={<ListingsManager />} />
           <Route path="/pricing" element={<PricingIntelligence />} />
           <Route path="/messaging" element={<MessagingHub />} />
-          <Route path="/operations/onboarding" element={<OperationsOnboarding />} />
+          
           <Route path="/operations/cleaning" element={<OperationsCleaning />} />
           <Route path="/operations/offboarding" element={<OperationsOffboarding />} />
           <Route path="*" element={<NotFound />} />
