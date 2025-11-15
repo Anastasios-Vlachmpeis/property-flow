@@ -1,10 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, RefreshCw, Sparkles, Building2, Plus, Pencil } from 'lucide-react';
+import { Upload, RefreshCw, Sparkles, Building2, Plus, Pencil, ArrowRight } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { fakeApiCall } from '@/lib/mockData';
 import { toast } from 'sonner';
@@ -18,9 +19,10 @@ const statusColors = {
 };
 
 export default function ListingsManager() {
-  const { listings, selectedListing, setSelectedListing, addListing, updateListing } = useStore();
+  const { listings, selectedListing, setSelectedListing, addListing, updateListing, pricingData } = useStore();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handlePostEverywhere = async () => {
     await fakeApiCall('/listings/post-all', { listingId: selectedListing?.id });
@@ -121,9 +123,10 @@ export default function ListingsManager() {
               </Button>
 
               <Tabs defaultValue="details" className="mt-4">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="details">Details</TabsTrigger>
                   <TabsTrigger value="photos">Photos</TabsTrigger>
+                  <TabsTrigger value="pricing">Pricing</TabsTrigger>
                   <TabsTrigger value="status">Status</TabsTrigger>
                 </TabsList>
                 
@@ -150,6 +153,53 @@ export default function ListingsManager() {
                       <img key={i} src={photo} alt="" className="w-full h-24 object-cover rounded-lg" />
                     ))}
                   </div>
+                </TabsContent>
+                
+                <TabsContent value="pricing" className="space-y-4 mt-4">
+                  <div>
+                    <h4 className="text-sm font-semibold text-foreground mb-2">Current Prices</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center p-2 bg-muted/50 rounded-lg">
+                        <span className="text-xs text-muted-foreground">Airbnb</span>
+                        <span className="text-sm font-semibold text-foreground">${selectedListing.airbnbPrice}/night</span>
+                      </div>
+                      <div className="flex justify-between items-center p-2 bg-muted/50 rounded-lg">
+                        <span className="text-xs text-muted-foreground">Booking.com</span>
+                        <span className="text-sm font-semibold text-foreground">${selectedListing.bookingPrice}/night</span>
+                      </div>
+                      <div className="flex justify-between items-center p-2 bg-muted/50 rounded-lg">
+                        <span className="text-xs text-muted-foreground">Vrbo</span>
+                        <span className="text-sm font-semibold text-foreground">${selectedListing.vrboPrice}/night</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {pricingData && (
+                    <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                      <h4 className="text-sm font-semibold text-foreground mb-2">AI Recommendation</h4>
+                      <div className="space-y-1">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-muted-foreground">Suggested Price</span>
+                          <span className="text-lg font-bold text-primary">${pricingData.recommendation.price}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-muted-foreground">Confidence</span>
+                          <span className="text-sm font-semibold text-foreground">{pricingData.recommendation.confidence}%</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-2">{pricingData.recommendation.explanation}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  <Button 
+                    onClick={() => navigate('/pricing')}
+                    className="w-full"
+                    variant="outline"
+                    size="sm"
+                  >
+                    View Full Analysis
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
                 </TabsContent>
                 
                 <TabsContent value="status" className="space-y-3 mt-4">
