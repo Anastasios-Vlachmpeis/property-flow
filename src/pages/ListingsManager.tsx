@@ -122,6 +122,7 @@ export default function ListingsManager() {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
         {/* Listings Table */}
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
@@ -170,7 +171,6 @@ export default function ListingsManager() {
           </div>
         </Card>
 
-        <div className="lg:col-span-2 space-y-6">
         {/* Availability Calendar */}
         {selectedListing && (
           <Card className="p-6">
@@ -229,6 +229,7 @@ export default function ListingsManager() {
             </p>
           </Card>
         )}
+        </div>
 
         {/* Detail Panel */}
         <Card className="p-6">
@@ -363,7 +364,6 @@ export default function ListingsManager() {
             </div>
           )}
         </Card>
-        </div>
         </div>
       )}
 
