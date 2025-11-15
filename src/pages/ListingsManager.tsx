@@ -233,15 +233,21 @@ export default function ListingsManager() {
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-foreground">Airbnb</span>
-                      <Badge className="bg-success text-success-foreground">Active</Badge>
+                      <Badge className={selectedListing.airbnbPrice > 0 ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground"}>
+                        {selectedListing.airbnbPrice > 0 ? "Active" : "Inactive"}
+                      </Badge>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-foreground">Booking.com</span>
-                      <Badge className="bg-success text-success-foreground">Active</Badge>
+                      <Badge className={selectedListing.bookingPrice > 0 ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground"}>
+                        {selectedListing.bookingPrice > 0 ? "Active" : "Inactive"}
+                      </Badge>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-foreground">Vrbo</span>
-                      <Badge className="bg-success text-success-foreground">Active</Badge>
+                      <Badge className={selectedListing.vrboPrice > 0 ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground"}>
+                        {selectedListing.vrboPrice > 0 ? "Active" : "Inactive"}
+                      </Badge>
                     </div>
                   </div>
                 </TabsContent>
