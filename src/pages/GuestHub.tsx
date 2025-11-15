@@ -11,10 +11,11 @@ import { useStore } from '@/store/useStore';
 import { useState, useEffect } from 'react';
 import { fakeApiCall } from '@/lib/mockData';
 import { toast } from 'sonner';
+import avatarPlaceholder from '@/assets/avatar-placeholder.png';
 
 const platformIcons = {
   airbnb: '🏠',
-  booking: '📘',
+  booking: avatarPlaceholder,
   vrbo: '🏖️',
 };
 
@@ -123,7 +124,13 @@ export default function GuestHub() {
               <Card key={request.id} className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-start gap-4">
-                    <div className="text-3xl">{platformIcons[request.platform]}</div>
+                    <div className="w-12 h-12 flex items-center justify-center">
+                      {request.platform === 'booking' ? (
+                        <img src={platformIcons[request.platform]} alt="Booking" className="w-10 h-10 rounded-full object-cover" />
+                      ) : (
+                        <span className="text-3xl">{platformIcons[request.platform]}</span>
+                      )}
+                    </div>
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-lg font-semibold text-foreground">{request.guestName}</h3>
@@ -211,7 +218,11 @@ export default function GuestHub() {
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-xl">{platformIcons[chat.platform]}</span>
+                        {chat.platform === 'booking' ? (
+                          <img src={platformIcons[chat.platform]} alt="Booking" className="w-6 h-6 rounded-full object-cover" />
+                        ) : (
+                          <span className="text-xl">{platformIcons[chat.platform]}</span>
+                        )}
                         <h4 className="font-semibold text-foreground text-sm">{chat.guestName}</h4>
                       </div>
                       <Badge variant={chat.isAuto ? 'default' : 'secondary'} className="text-xs">
@@ -233,7 +244,11 @@ export default function GuestHub() {
                     <div className="p-4 border-b border-border">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <span className="text-2xl">{platformIcons[selectedChat.platform]}</span>
+                          {selectedChat.platform === 'booking' ? (
+                            <img src={platformIcons[selectedChat.platform]} alt="Booking" className="w-8 h-8 rounded-full object-cover" />
+                          ) : (
+                            <span className="text-2xl">{platformIcons[selectedChat.platform]}</span>
+                          )}
                           <div>
                             <h3 className="font-semibold text-foreground">{selectedChat.guestName}</h3>
                             <p className="text-xs text-muted-foreground capitalize">{selectedChat.platform}</p>
