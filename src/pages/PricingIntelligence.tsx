@@ -1,15 +1,17 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, CheckCircle, MapPin, Star } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { TrendingUp, CheckCircle, MapPin, Star, ChevronDown } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { mockPricingData, fakeApiCall } from '@/lib/mockData';
 import { toast } from 'sonner';
 
 export default function PricingIntelligence() {
-  const { selectedListing, pricingData, setPricingData } = useStore();
+  const { selectedListing, listings, setSelectedListing, pricingData, setPricingData } = useStore();
+  const [isListingDialogOpen, setIsListingDialogOpen] = useState(false);
 
   useEffect(() => {
     if (selectedListing) {
@@ -23,6 +25,14 @@ export default function PricingIntelligence() {
       price: pricingData?.recommendation.price,
     });
     toast.success('Price updated across all platforms');
+  };
+
+  const handleSelectListing = (listingId: string) => {
+    const listing = listings.find(l => l.id === listingId);
+    if (listing) {
+      setSelectedListing(listing);
+      setIsListingDialogOpen(false);
+    }
   };
 
   if (!selectedListing) {
@@ -41,13 +51,19 @@ export default function PricingIntelligence() {
     <AppLayout title="Pricing Intelligence">
       <div className="space-y-6">
         {/* Selected Listing Info */}
-        <Card className="p-4 bg-primary/5 border-primary/20">
-          <div className="flex items-center gap-3">
-            <img src={selectedListing.thumbnail} alt="" className="w-16 h-16 rounded-lg object-cover" />
-            <div>
-              <h3 className="font-semibold text-foreground">{selectedListing.title}</h3>
-              <p className="text-sm text-muted-foreground">{selectedListing.location}</p>
+        <Card 
+          className="p-4 bg-primary/5 border-primary/20 cursor-pointer hover:border-primary/40 transition-colors"
+          onClick={() => setIsListingDialogOpen(true)}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <img src={selectedListing.thumbnail} alt="" className="w-16 h-16 rounded-lg object-cover" />
+              <div>
+                <h3 className="font-semibold text-foreground">{selectedListing.title}</h3>
+                <p className="text-sm text-muted-foreground">{selectedListing.location}</p>
+              </div>
             </div>
+            <ChevronDown className="h-5 w-5 text-muted-foreground" />
           </div>
         </Card>
 
@@ -142,6 +158,56 @@ export default function PricingIntelligence() {
           </Card>
         )}
       </div>
+
+      {/* Listing Selection Dialog */}
+      <Dialog open={isListingDialogOpen} onOpenChange={setIsListingDialogOpen}>
+        <DialogContent className="max-w-2xl bg-background z-50">
+          <DialogHeader>
+            <DialogTitle>Select Listing for Pricing Analysis</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+            {listings.map((listing) => (
+              <div
+                key={listing.id}
+                onClick={() => handleSelectListing(listing.id)}
+                className={`p-4 rounded-lg border cursor-pointer transition-all hover:border-primary/50 hover:shadow-md ${
+                  selectedListing?.id === listing.id
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border'
+                }`}
+              >
+                <div className="flex gap-4">
+                  <img
+                    src={listing.thumbnail}
+                    alt={listing.title}
+                    className="w-20 h-16 object-cover rounded-lg"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h4 className="font-semibold text-foreground">{listing.title}</h4>
+                        <p className="text-sm text-muted-foreground">{listing.location}</p>
+                      </div>
+                      <Badge className={
+                        listing.syncStatus === 'synced' ? 'bg-success text-success-foreground' :
+                        listing.syncStatus === 'pending' ? 'bg-warning text-warning-foreground' :
+                        'bg-destructive text-destructive-foreground'
+                      }>
+                        {listing.syncStatus}
+                      </Badge>
+                    </div>
+                    <div className="flex gap-4 text-sm">
+                      <span className="text-muted-foreground">Airbnb: <span className="font-semibold text-foreground">${listing.airbnbPrice}</span></span>
+                      <span className="text-muted-foreground">Booking: <span className="font-semibold text-foreground">${listing.bookingPrice}</span></span>
+                      <span className="text-muted-foreground">Vrbo: <span className="font-semibold text-foreground">${listing.vrboPrice}</span></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }
