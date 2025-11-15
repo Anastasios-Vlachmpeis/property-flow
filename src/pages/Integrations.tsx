@@ -10,6 +10,7 @@ import { CheckCircle, XCircle, Link as LinkIcon, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 import airbnbLogo from '@/assets/airbnb-logo.jpg';
 import bookingLogo from '@/assets/booking-logo.png';
+import vrboLogo from '@/assets/vrbo-logo.png';
 
 interface Integration {
   id: string;
@@ -44,7 +45,7 @@ const initialIntegrations: Integration[] = [
   {
     id: 'vrbo',
     name: 'Vrbo',
-    icon: '🏡',
+    iconImage: vrboLogo,
     color: 'bg-[#FFB400]',
     connected: true,
     description: 'Integrate with Vrbo to sync your vacation rental listings',
