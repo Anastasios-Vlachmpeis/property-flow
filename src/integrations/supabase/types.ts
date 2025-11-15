@@ -22,6 +22,7 @@ export type Database = {
           id: string
           last_sync: string | null
           location: string
+          max_guests: number
           photos: string[]
           sync_status: string
           thumbnail: string | null
@@ -37,6 +38,7 @@ export type Database = {
           id?: string
           last_sync?: string | null
           location: string
+          max_guests?: number
           photos?: string[]
           sync_status?: string
           thumbnail?: string | null
@@ -52,6 +54,7 @@ export type Database = {
           id?: string
           last_sync?: string | null
           location?: string
+          max_guests?: number
           photos?: string[]
           sync_status?: string
           thumbnail?: string | null

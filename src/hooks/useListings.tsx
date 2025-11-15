@@ -22,6 +22,7 @@ export const useListings = () => {
         location: listing.location,
         thumbnail: listing.thumbnail || listing.photos?.[0] || '/placeholder.svg',
         photos: listing.photos || [],
+        maxGuests: listing.max_guests || 2,
         airbnbPrice: Number(listing.airbnb_price),
         bookingPrice: Number(listing.booking_price),
         vrboPrice: Number(listing.vrbo_price),
@@ -48,6 +49,7 @@ export const useListings = () => {
           user_id: user.id,
           title: listing.title,
           location: listing.location,
+          max_guests: listing.maxGuests,
           airbnb_price: listing.airbnbPrice,
           booking_price: listing.bookingPrice,
           vrbo_price: listing.vrboPrice,
@@ -76,6 +78,7 @@ export const useListings = () => {
         .update({
           title: updates.title,
           location: updates.location,
+          max_guests: updates.maxGuests,
           airbnb_price: updates.airbnbPrice,
           booking_price: updates.bookingPrice,
           vrbo_price: updates.vrboPrice,

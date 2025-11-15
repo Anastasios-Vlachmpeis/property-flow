@@ -22,6 +22,7 @@ export function ListingFormDialog({ open, onOpenChange, listing, onSave }: Listi
   const [formData, setFormData] = useState({
     title: listing?.title || '',
     location: listing?.location || '',
+    maxGuests: listing?.maxGuests || 2,
     description: listing?.description || '',
     amenities: listing?.amenities || [],
     airbnbPrice: listing?.airbnbPrice || 0,
@@ -171,6 +172,19 @@ export function ListingFormDialog({ open, onOpenChange, listing, onSave }: Listi
                 id="location"
                 value={formData.location}
                 onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="maxGuests">Maximum Guests *</Label>
+              <Input
+                id="maxGuests"
+                type="number"
+                min="1"
+                value={formData.maxGuests}
+                onChange={(e) => setFormData(prev => ({ ...prev, maxGuests: parseInt(e.target.value) || 1 }))}
+                placeholder="e.g., 4"
                 required
               />
             </div>

@@ -5,6 +5,7 @@ export interface Listing {
   title: string;
   location: string;
   thumbnail: string;
+  maxGuests: number;
   airbnbPrice: number;
   bookingPrice: number;
   vrboPrice: number;
