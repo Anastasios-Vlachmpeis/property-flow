@@ -17,6 +17,7 @@ export type Database = {
       listings: {
         Row: {
           airbnb_price: number
+          amenities: string[] | null
           bedrooms: number
           beds: number
           booking_price: number
@@ -36,6 +37,7 @@ export type Database = {
         }
         Insert: {
           airbnb_price?: number
+          amenities?: string[] | null
           bedrooms?: number
           beds?: number
           booking_price?: number
@@ -55,6 +57,7 @@ export type Database = {
         }
         Update: {
           airbnb_price?: number
+          amenities?: string[] | null
           bedrooms?: number
           beds?: number
           booking_price?: number
