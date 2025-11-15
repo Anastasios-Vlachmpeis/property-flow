@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { X, Upload } from 'lucide-react';
+import { X, Upload, Image as ImageIcon } from 'lucide-react';
 import { Listing } from '@/store/useStore';
 import { toast } from 'sonner';
 
@@ -18,6 +18,7 @@ interface ListingFormDialogProps {
 }
 
 export function ListingFormDialog({ open, onOpenChange, listing, onSave }: ListingFormDialogProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     title: listing?.title || '',
     location: listing?.location || '',
@@ -36,6 +37,71 @@ export function ListingFormDialog({ open, onOpenChange, listing, onSave }: Listi
   });
 
   const [newAmenity, setNewAmenity] = useState('');
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const currentPhotoCount = formData.photos.length;
+    const remainingSlots = 10 - currentPhotoCount;
+
+    if (files.length > remainingSlots) {
+      toast.error(`You can only add ${remainingSlots} more photo(s). Maximum is 10 photos.`);
+      return;
+    }
+
+    const newPhotos: string[] = [];
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      
+      if (!file.type.startsWith('image/')) {
+        toast.error(`${file.name} is not an image file`);
+        continue;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`${file.name} is too large. Maximum size is 5MB`);
+        continue;
+      }
+
+      try {
+        const dataUrl = await readFileAsDataURL(file);
+        newPhotos.push(dataUrl);
+      } catch (error) {
+        toast.error(`Failed to load ${file.name}`);
+      }
+    }
+
+    if (newPhotos.length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        photos: [...prev.photos, ...newPhotos]
+      }));
+      toast.success(`Added ${newPhotos.length} photo(s)`);
+    }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const readFileAsDataURL = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleRemovePhoto = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      photos: prev.photos.filter((_, i) => i !== index)
+    }));
+    toast.success('Photo removed');
+  };
 
   const handleAddAmenity = () => {
     if (newAmenity.trim()) {
@@ -116,19 +182,74 @@ export function ListingFormDialog({ open, onOpenChange, listing, onSave }: Listi
           </div>
 
           {/* Photos */}
-          <div className="space-y-2">
-            <Label htmlFor="thumbnail">Thumbnail URL *</Label>
-            <Input
-              id="thumbnail"
-              type="url"
-              value={formData.thumbnail}
-              onChange={(e) => setFormData(prev => ({ ...prev, thumbnail: e.target.value }))}
-              placeholder="https://..."
-              required
-            />
-            {formData.thumbnail && (
-              <img src={formData.thumbnail} alt="Thumbnail preview" className="w-32 h-24 object-cover rounded-lg mt-2" />
-            )}
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="thumbnail">Thumbnail URL *</Label>
+              <Input
+                id="thumbnail"
+                type="url"
+                value={formData.thumbnail}
+                onChange={(e) => setFormData(prev => ({ ...prev, thumbnail: e.target.value }))}
+                placeholder="https://..."
+                required
+              />
+              {formData.thumbnail && (
+                <img src={formData.thumbnail} alt="Thumbnail preview" className="w-32 h-24 object-cover rounded-lg mt-2" />
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label>Additional Photos ({formData.photos.length}/10)</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={formData.photos.length >= 10}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Add Photos
+                </Button>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              
+              {formData.photos.length > 0 && (
+                <div className="grid grid-cols-4 gap-3 mt-3">
+                  {formData.photos.map((photo, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={photo}
+                        alt={`Photo ${index + 1}`}
+                        className="w-full h-24 object-cover rounded-lg border border-border"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemovePhoto(index)}
+                        className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {formData.photos.length === 0 && (
+                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+                  <ImageIcon className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-50" />
+                  <p className="text-sm text-muted-foreground">No photos added yet</p>
+                  <p className="text-xs text-muted-foreground mt-1">Click "Add Photos" to upload images</p>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Amenities */}
