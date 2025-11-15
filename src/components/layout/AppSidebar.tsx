@@ -30,7 +30,7 @@ export function AppSidebar() {
   return (
     <aside className="w-64 bg-sidebar text-sidebar-foreground flex flex-col border-r border-sidebar-border">
       <div className="p-6 border-b border-sidebar-border">
-        <h1 className="text-2xl font-serif font-bold text-sidebar-primary">PropManager</h1>
+        <h1 className="text-2xl font-logo font-black text-sidebar-primary tracking-tight">RentOut</h1>
         <p className="text-xs text-sidebar-foreground/70 mt-1 font-sans">Automation Platform</p>
       </div>
 

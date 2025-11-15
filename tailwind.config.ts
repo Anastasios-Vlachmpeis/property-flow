@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         serif: ['Crimson Pro', 'serif'],
         sans: ['Inter', 'sans-serif'],
+        logo: ['Poppins', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
