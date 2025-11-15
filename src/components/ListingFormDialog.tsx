@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,23 +20,47 @@ interface ListingFormDialogProps {
 export function ListingFormDialog({ open, onOpenChange, listing, onSave }: ListingFormDialogProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
-    title: listing?.title || '',
-    location: listing?.location || '',
-    maxGuests: listing?.maxGuests || 2,
-    bedrooms: listing?.bedrooms || 1,
-    beds: listing?.beds || 1,
-    description: listing?.description || '',
-    amenities: listing?.amenities || [],
-    airbnbPrice: listing?.airbnbPrice || 0,
-    bookingPrice: listing?.bookingPrice || 0,
-    vrboPrice: listing?.vrboPrice || 0,
-    photos: listing?.photos || [],
+    title: '',
+    location: '',
+    maxGuests: 2,
+    bedrooms: 1,
+    beds: 1,
+    description: '',
+    amenities: [] as string[],
+    airbnbPrice: 0,
+    bookingPrice: 0,
+    vrboPrice: 0,
+    photos: [] as string[],
     platforms: {
-      airbnb: listing ? listing.airbnbPrice > 0 : true,
-      booking: listing ? listing.bookingPrice > 0 : true,
-      vrbo: listing ? listing.vrboPrice > 0 : true,
+      airbnb: true,
+      booking: true,
+      vrbo: true,
     }
   });
+
+  // Update form data when listing or dialog open state changes
+  useEffect(() => {
+    if (open) {
+      setFormData({
+        title: listing?.title || '',
+        location: listing?.location || '',
+        maxGuests: listing?.maxGuests || 2,
+        bedrooms: listing?.bedrooms || 1,
+        beds: listing?.beds || 1,
+        description: listing?.description || '',
+        amenities: listing?.amenities || [],
+        airbnbPrice: listing?.airbnbPrice || 0,
+        bookingPrice: listing?.bookingPrice || 0,
+        vrboPrice: listing?.vrboPrice || 0,
+        photos: listing?.photos || [],
+        platforms: {
+          airbnb: listing ? listing.airbnbPrice > 0 : true,
+          booking: listing ? listing.bookingPrice > 0 : true,
+          vrbo: listing ? listing.vrboPrice > 0 : true,
+        }
+      });
+    }
+  }, [open, listing]);
 
   const [newAmenity, setNewAmenity] = useState('');
 
