@@ -15,6 +15,7 @@ export interface Listing {
   description?: string;
   amenities?: string[];
   photos?: string[];
+  lastSync?: string;
   availability?: {
     date: string;
     available: boolean;

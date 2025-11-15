@@ -1,103 +1,135 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { KpiCard } from '@/components/KpiCard';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Building2, Calendar, DollarSign, Activity } from 'lucide-react';
+import { Building2, Calendar, DollarSign, TrendingUp } from 'lucide-react';
 import { useStore } from '@/store/useStore';
-import { mockListings, mockChats, mockActivities } from '@/lib/mockData';
+import { useListings } from '@/hooks/useListings';
+import { format, isAfter, isBefore, parseISO } from 'date-fns';
 
-const automationItems = [
-  { name: 'Listing Sync', key: 'listingSync' as const },
-  { name: 'Price Sync', key: 'priceSync' as const },
-  { name: 'Messaging Automation', key: 'messaging' as const },
-  { name: 'Cleaning Workflows', key: 'cleaning' as const },
-  { name: 'Offboarding Workflows', key: 'offboarding' as const },
-];
-
-const statusColors = {
-  active: 'bg-success text-success-foreground',
-  warning: 'bg-warning text-warning-foreground',
-  error: 'bg-destructive text-destructive-foreground',
+const platformIcons: Record<string, string> = {
+  airbnb: '🏠',
+  booking: '🏨',
+  vrbo: '🏡',
 };
 
 export default function Dashboard() {
-  const { kpis, setKpis, automationStatus, recentActivity, setListings, setChats, addActivity } = useStore();
+  const { listings } = useListings();
+  const { recentActivity } = useStore();
 
-  useEffect(() => {
-    // Initialize mock data
-    setListings(mockListings);
-    setChats(mockChats);
-    setKpis({
-      totalListings: mockListings.length,
-      upcomingBookings: 12,
-      revenue: 8450,
-    });
+  const stats = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     
-    mockActivities.forEach((activity) => addActivity(activity));
-  }, []);
+    let upcomingBookings = 0;
+    let pastRevenue = 0;
+    const activities: Array<{ id: string; message: string; timestamp: string; }> = [];
+    
+    listings.forEach((listing) => {
+      if (!listing.availability) return;
+      
+      listing.availability.forEach((availability) => {
+        const date = parseISO(availability.date);
+        
+        if (availability.bookedBy) {
+          if (isAfter(date, today) || format(date, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd')) {
+            upcomingBookings++;
+          } else if (availability.isPast) {
+            // Calculate revenue from past bookings
+            const price = availability.bookedBy === 'airbnb' ? listing.airbnbPrice :
+                         availability.bookedBy === 'booking' ? listing.bookingPrice :
+                         listing.vrboPrice;
+            pastRevenue += price;
+          }
+        }
+      });
+    });
+
+    // Generate activities from listing data
+    const sortedListings = [...listings].sort((a, b) => 
+      new Date(b.lastSync || 0).getTime() - new Date(a.lastSync || 0).getTime()
+    );
+
+    sortedListings.slice(0, 5).forEach((listing) => {
+      if (listing.lastSync) {
+        activities.push({
+          id: `sync-${listing.id}`,
+          message: `Listing "${listing.title}" synced across all platforms`,
+          timestamp: format(new Date(listing.lastSync), 'MMM dd, yyyy HH:mm')
+        });
+      }
+    });
+
+    // Add booking activities
+    listings.forEach((listing) => {
+      if (!listing.availability) return;
+      
+      const recentBookings = listing.availability
+        .filter(a => a.bookedBy && !a.isPast)
+        .sort((a, b) => b.date.localeCompare(a.date))
+        .slice(0, 3);
+
+      recentBookings.forEach((booking) => {
+        const platform = booking.bookedBy === 'airbnb' ? 'Airbnb' :
+                        booking.bookedBy === 'booking' ? 'Booking.com' : 'Vrbo';
+        activities.push({
+          id: `booking-${listing.id}-${booking.date}`,
+          message: `New ${platform} booking for "${listing.title}" by ${booking.guestName}`,
+          timestamp: format(parseISO(booking.date), 'MMM dd, yyyy')
+        });
+      });
+    });
+
+    return {
+      totalListings: listings.length,
+      upcomingBookings,
+      revenue: pastRevenue,
+      activities: activities.slice(0, 10)
+    };
+  }, [listings]);
 
   return (
     <AppLayout title="Dashboard">
       <div className="space-y-6">
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <KpiCard
             title="Total Listings"
-            value={kpis.totalListings}
+            value={stats.totalListings}
             icon={Building2}
-            trend={{ value: '+2 this month', isPositive: true }}
           />
           <KpiCard
             title="Upcoming Bookings"
-            value={kpis.upcomingBookings}
+            value={stats.upcomingBookings}
             icon={Calendar}
-            trend={{ value: '+18% vs last week', isPositive: true }}
           />
           <KpiCard
-            title="Revenue (30 days)"
-            value={`$${kpis.revenue.toLocaleString()}`}
+            title="Past Revenue"
+            value={`$${stats.revenue.toLocaleString()}`}
             icon={DollarSign}
-            trend={{ value: '+12% vs last month', isPositive: true }}
-          />
-          <KpiCard
-            title="Automation Status"
-            value="All Active"
-            icon={Activity}
           />
         </div>
-
-        {/* Automation Status */}
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold text-foreground mb-4">Automation Status</h3>
-          <div className="space-y-3">
-            {automationItems.map((item) => (
-              <div key={item.key} className="flex items-center justify-between py-2">
-                <span className="text-sm font-medium text-foreground">{item.name}</span>
-                <Badge className={statusColors[automationStatus[item.key]]}>
-                  {automationStatus[item.key]}
-                </Badge>
-              </div>
-            ))}
-          </div>
-        </Card>
 
         {/* Recent Activity */}
         <Card className="p-6">
           <h3 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h3>
-          <div className="space-y-4">
-            {recentActivity.map((activity) => (
-              <div key={activity.id} className="flex items-start gap-3 pb-4 border-b border-border last:border-0">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Activity className="h-4 w-4 text-primary" />
+          {stats.activities.length > 0 ? (
+            <div className="space-y-4">
+              {stats.activities.map((activity) => (
+                <div key={activity.id} className="flex items-start gap-3 pb-4 border-b border-border last:border-0">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <TrendingUp className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">{activity.message}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{activity.timestamp}</p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">{activity.message}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{activity.timestamp}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">No recent activity</p>
+          )}
         </Card>
       </div>
     </AppLayout>
