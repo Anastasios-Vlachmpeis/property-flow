@@ -8,11 +8,13 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { CheckCircle, XCircle, Link as LinkIcon, Settings } from 'lucide-react';
 import { toast } from 'sonner';
+import airbnbLogo from '@/assets/airbnb-logo.jpg';
 
 interface Integration {
   id: string;
   name: string;
-  icon: string;
+  icon?: string;
+  iconImage?: string;
   color: string;
   connected: boolean;
   description: string;
@@ -23,7 +25,7 @@ const initialIntegrations: Integration[] = [
   {
     id: 'airbnb',
     name: 'Airbnb',
-    icon: '🏠',
+    iconImage: airbnbLogo,
     color: 'bg-[#FF385C]',
     connected: true,
     description: 'Sync your Airbnb listings, bookings, and calendar automatically',
@@ -112,8 +114,12 @@ export default function Integrations() {
             <Card key={integration.id} className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className={`w-12 h-12 rounded-lg ${integration.color} flex items-center justify-center text-2xl`}>
-                    {integration.icon}
+                  <div className={`w-12 h-12 rounded-lg ${integration.color} flex items-center justify-center text-2xl overflow-hidden`}>
+                    {integration.iconImage ? (
+                      <img src={integration.iconImage} alt={integration.name} className="w-full h-full object-cover" />
+                    ) : (
+                      integration.icon
+                    )}
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">{integration.name}</h3>
