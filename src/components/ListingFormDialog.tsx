@@ -27,7 +27,6 @@ export function ListingFormDialog({ open, onOpenChange, listing, onSave }: Listi
     airbnbPrice: listing?.airbnbPrice || 0,
     bookingPrice: listing?.bookingPrice || 0,
     vrboPrice: listing?.vrboPrice || 0,
-    thumbnail: listing?.thumbnail || '',
     photos: listing?.photos || [],
     platforms: {
       airbnb: listing ? listing.airbnbPrice > 0 : true,
@@ -123,8 +122,14 @@ export function ListingFormDialog({ open, onOpenChange, listing, onSave }: Listi
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (formData.photos.length === 0) {
+      toast.error('Please add at least one photo');
+      return;
+    }
+    
     const listingData: Partial<Listing> = {
       ...formData,
+      thumbnail: formData.photos[0], // First photo becomes the thumbnail
       airbnbPrice: formData.platforms.airbnb ? formData.airbnbPrice : 0,
       bookingPrice: formData.platforms.booking ? formData.bookingPrice : 0,
       vrboPrice: formData.platforms.vrbo ? formData.vrboPrice : 0,
@@ -184,23 +189,11 @@ export function ListingFormDialog({ open, onOpenChange, listing, onSave }: Listi
           {/* Photos */}
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="thumbnail">Thumbnail URL *</Label>
-              <Input
-                id="thumbnail"
-                type="url"
-                value={formData.thumbnail}
-                onChange={(e) => setFormData(prev => ({ ...prev, thumbnail: e.target.value }))}
-                placeholder="https://..."
-                required
-              />
-              {formData.thumbnail && (
-                <img src={formData.thumbnail} alt="Thumbnail preview" className="w-32 h-24 object-cover rounded-lg mt-2" />
-              )}
-            </div>
-
-            <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label>Additional Photos ({formData.photos.length}/10)</Label>
+                <div>
+                  <Label>Photos ({formData.photos.length}/10) *</Label>
+                  <p className="text-xs text-muted-foreground mt-1">First photo will be used as thumbnail</p>
+                </div>
                 <Button
                   type="button"
                   variant="outline"
@@ -230,6 +223,11 @@ export function ListingFormDialog({ open, onOpenChange, listing, onSave }: Listi
                         alt={`Photo ${index + 1}`}
                         className="w-full h-24 object-cover rounded-lg border border-border"
                       />
+                      {index === 0 && (
+                        <div className="absolute top-1 left-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded">
+                          Thumbnail
+                        </div>
+                      )}
                       <button
                         type="button"
                         onClick={() => handleRemovePhoto(index)}
@@ -246,7 +244,7 @@ export function ListingFormDialog({ open, onOpenChange, listing, onSave }: Listi
                 <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
                   <ImageIcon className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-50" />
                   <p className="text-sm text-muted-foreground">No photos added yet</p>
-                  <p className="text-xs text-muted-foreground mt-1">Click "Add Photos" to upload images</p>
+                  <p className="text-xs text-muted-foreground mt-1">Click "Add Photos" to upload at least 1 image</p>
                 </div>
               )}
             </div>
