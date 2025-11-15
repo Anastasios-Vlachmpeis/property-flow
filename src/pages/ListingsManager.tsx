@@ -27,6 +27,7 @@ export default function ListingsManager() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState(new Date());
+  const [rangeStart, setRangeStart] = useState<Date | null>(null);
   const navigate = useNavigate();
 
   // Keep selected listing in sync after add/update refetches
@@ -79,32 +80,81 @@ export default function ListingsManager() {
     
     const dateStr = format(date, 'yyyy-MM-dd');
     const currentAvailability = selectedListing.availability || [];
-    const existingDate = currentAvailability.find(a => a.date === dateStr);
     
-    let newAvailability;
-    if (existingDate) {
-      // Toggle blocked status if not booked
-      if (!existingDate.bookedBy) {
-        newAvailability = currentAvailability.map(a => 
-          a.date === dateStr 
-            ? { ...a, blocked: !a.blocked, available: a.blocked } 
-            : a
-        );
-      } else {
-        // Can't modify booked dates
+    // If this is the first click, set it as range start
+    if (!rangeStart) {
+      const existingDate = currentAvailability.find(a => a.date === dateStr);
+      
+      // Check if date is booked
+      if (existingDate?.bookedBy) {
         toast.error('Cannot modify - this date is already booked');
         return;
       }
-    } else {
-      // Add new blocked date
-      newAvailability = [...currentAvailability, { 
-        date: dateStr, 
-        available: false, 
-        blocked: true 
-      }];
+      
+      setRangeStart(date);
+      toast.info('Click another date to complete the range');
+      return;
     }
     
+    // Second click - process the range
+    const start = rangeStart < date ? rangeStart : date;
+    const end = rangeStart < date ? date : rangeStart;
+    
+    // Generate all dates in the range
+    const datesInRange: Date[] = [];
+    const currentDate = new Date(start);
+    while (currentDate <= end) {
+      datesInRange.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    // Check if any date in range is booked
+    const hasBookedDate = datesInRange.some(d => {
+      const dStr = format(d, 'yyyy-MM-dd');
+      const existing = currentAvailability.find(a => a.date === dStr);
+      return existing?.bookedBy;
+    });
+    
+    if (hasBookedDate) {
+      toast.error('Range contains booked dates - cannot modify');
+      setRangeStart(null);
+      return;
+    }
+    
+    // Check if all dates in range are currently blocked
+    const allBlocked = datesInRange.every(d => {
+      const dStr = format(d, 'yyyy-MM-dd');
+      const existing = currentAvailability.find(a => a.date === dStr);
+      return existing?.blocked === true;
+    });
+    
+    // Toggle the range
+    let newAvailability = [...currentAvailability];
+    
+    datesInRange.forEach(d => {
+      const dStr = format(d, 'yyyy-MM-dd');
+      const existingIndex = newAvailability.findIndex(a => a.date === dStr);
+      
+      if (existingIndex >= 0) {
+        // Update existing
+        newAvailability[existingIndex] = {
+          ...newAvailability[existingIndex],
+          blocked: !allBlocked,
+          available: allBlocked
+        };
+      } else {
+        // Add new blocked date
+        newAvailability.push({
+          date: dStr,
+          available: allBlocked,
+          blocked: !allBlocked
+        });
+      }
+    });
+    
     dbUpdateListing(selectedListing.id, { availability: newAvailability });
+    setRangeStart(null);
+    toast.success(allBlocked ? 'Range unblocked' : 'Range blocked');
   };
 
   const getDateStatus = (date: Date) => {
@@ -214,18 +264,22 @@ export default function ListingsManager() {
                 blocked: (date) => {
                   const status = getDateStatus(date);
                   return status?.blocked === true;
+                },
+                rangeStart: (date) => {
+                  return rangeStart !== null && format(date, 'yyyy-MM-dd') === format(rangeStart, 'yyyy-MM-dd');
                 }
               }}
               modifiersClassNames={{
                 airbnb: 'bg-[#FF385C] text-white hover:bg-[#FF385C]/90',
                 booking: 'bg-[#003580] text-white hover:bg-[#003580]/90',
                 vrbo: 'bg-[#FFB400] text-black hover:bg-[#FFB400]/90',
-                blocked: 'line-through bg-muted text-muted-foreground hover:bg-muted/80'
+                blocked: 'line-through bg-muted text-muted-foreground hover:bg-muted/80',
+                rangeStart: 'ring-2 ring-primary ring-offset-2'
               }}
               onDayClick={handleDateClick}
             />
             <p className="text-xs text-muted-foreground mt-3">
-              Click on dates to block/unblock availability
+              Click two dates to block/unblock a range
             </p>
           </Card>
         )}
