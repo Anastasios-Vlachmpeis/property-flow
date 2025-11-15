@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { CheckCircle, XCircle, Link as LinkIcon, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 import airbnbLogo from '@/assets/airbnb-logo.jpg';
+import bookingLogo from '@/assets/booking-logo.png';
 
 interface Integration {
   id: string;
@@ -34,7 +35,7 @@ const initialIntegrations: Integration[] = [
   {
     id: 'booking',
     name: 'Booking.com',
-    icon: '🏨',
+    iconImage: bookingLogo,
     color: 'bg-[#003580]',
     connected: true,
     description: 'Connect to Booking.com to manage reservations and availability',
