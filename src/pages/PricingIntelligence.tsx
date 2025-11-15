@@ -139,25 +139,25 @@ export default function PricingIntelligence() {
                   <div className="flex-1 flex items-center gap-2">
                     <div className="flex-1 bg-muted rounded-full h-8 relative overflow-hidden">
                       <div
-                        className="absolute left-0 top-0 h-full bg-primary/20"
+                        className="absolute left-0 top-0 h-full bg-brown/30"
                         style={{ width: `${(pricingData.trend.yourPrice[i] / 300) * 100}%` }}
                       />
                       <div
-                        className="absolute left-0 top-0 h-full bg-secondary/20"
+                        className="absolute left-0 top-0 h-full bg-muted-foreground/20"
                         style={{ width: `${(pricingData.trend.competitorAvg[i] / 300) * 100}%` }}
                       />
                     </div>
-                    <span className="text-sm font-semibold text-primary w-12">${pricingData.trend.yourPrice[i]}</span>
+                    <span className="text-sm font-semibold text-brown w-12">${pricingData.trend.yourPrice[i]}</span>
                   </div>
                 </div>
               ))}
               <div className="flex gap-4 pt-2 border-t border-border">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-primary/40" />
+                  <div className="w-3 h-3 rounded-full bg-brown" />
                   <span className="text-xs text-muted-foreground">Your Price</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-secondary/40" />
+                  <div className="w-3 h-3 rounded-full bg-muted-foreground" />
                   <span className="text-xs text-muted-foreground">Competitor Avg</span>
                 </div>
               </div>

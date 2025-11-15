@@ -42,6 +42,9 @@ All colors MUST be HSL.
     --warning: 40 90% 55%;
     --warning-foreground: 0 0% 100%;
 
+    --brown: 25 50% 40%;
+    --brown-foreground: 0 0% 100%;
+
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
