@@ -15,7 +15,12 @@ export interface Listing {
   description?: string;
   amenities?: string[];
   photos?: string[];
-  availability?: { date: string; available: boolean }[];
+  availability?: { 
+    date: string; 
+    available: boolean;
+    bookedBy?: 'airbnb' | 'booking' | 'vrbo';
+    blocked?: boolean;
+  }[];
 }
 
 export interface Chat {
