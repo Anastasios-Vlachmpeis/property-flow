@@ -12,9 +12,10 @@ import { useState, useEffect } from 'react';
 import { fakeApiCall } from '@/lib/mockData';
 import { toast } from 'sonner';
 import avatarPlaceholder from '@/assets/avatar-placeholder.png';
+import airbnbAvatar from '@/assets/airbnb-avatar.jpg';
 
 const platformIcons = {
-  airbnb: '🏠',
+  airbnb: airbnbAvatar,
   booking: avatarPlaceholder,
   vrbo: '🏖️',
 };
@@ -125,10 +126,10 @@ export default function GuestHub() {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 flex items-center justify-center">
-                      {request.platform === 'booking' ? (
-                        <img src={platformIcons[request.platform]} alt="Booking" className="w-10 h-10 rounded-full object-cover" />
-                      ) : (
+                      {request.platform === 'vrbo' ? (
                         <span className="text-3xl">{platformIcons[request.platform]}</span>
+                      ) : (
+                        <img src={platformIcons[request.platform]} alt={request.platform} className="w-10 h-10 rounded-full object-cover" />
                       )}
                     </div>
                     <div>
@@ -218,10 +219,10 @@ export default function GuestHub() {
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        {chat.platform === 'booking' ? (
-                          <img src={platformIcons[chat.platform]} alt="Booking" className="w-6 h-6 rounded-full object-cover" />
-                        ) : (
+                        {chat.platform === 'vrbo' ? (
                           <span className="text-xl">{platformIcons[chat.platform]}</span>
+                        ) : (
+                          <img src={platformIcons[chat.platform]} alt={chat.platform} className="w-6 h-6 rounded-full object-cover" />
                         )}
                         <h4 className="font-semibold text-foreground text-sm">{chat.guestName}</h4>
                       </div>
@@ -244,10 +245,10 @@ export default function GuestHub() {
                     <div className="p-4 border-b border-border">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          {selectedChat.platform === 'booking' ? (
-                            <img src={platformIcons[selectedChat.platform]} alt="Booking" className="w-8 h-8 rounded-full object-cover" />
-                          ) : (
+                          {selectedChat.platform === 'vrbo' ? (
                             <span className="text-2xl">{platformIcons[selectedChat.platform]}</span>
+                          ) : (
+                            <img src={platformIcons[selectedChat.platform]} alt={selectedChat.platform} className="w-8 h-8 rounded-full object-cover" />
                           )}
                           <div>
                             <h3 className="font-semibold text-foreground">{selectedChat.guestName}</h3>
