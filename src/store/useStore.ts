@@ -24,6 +24,7 @@ export interface Listing {
     checkIn?: string;
     checkOut?: string;
     guests?: number;
+    isPast?: boolean;
   }[];
 }
 

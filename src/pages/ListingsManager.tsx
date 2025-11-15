@@ -190,6 +190,7 @@ export default function ListingsManager() {
           {status.guests && <div className="text-muted-foreground">{status.guests} guest{status.guests > 1 ? 's' : ''}</div>}
           <div className="text-muted-foreground">Check-in: {status.checkIn}</div>
           <div className="text-muted-foreground">Check-out: {status.checkOut}</div>
+          {status.isPast && <div className="text-xs text-muted-foreground mt-1 italic">Past booking</div>}
         </div>
       );
     }
@@ -272,6 +273,10 @@ export default function ListingsManager() {
                 <span>Vrbo</span>
               </div>
               <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded bg-foreground/80"></div>
+                <span>Past Booking</span>
+              </div>
+              <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded bg-muted line-through"></div>
                 <span>Blocked</span>
               </div>
@@ -283,17 +288,21 @@ export default function ListingsManager() {
                 onMonthChange={setCalendarMonth}
                 className="rounded-md border pointer-events-auto"
                 modifiers={{
+                  pastBooking: (date) => {
+                    const status = getDateStatus(date);
+                    return status?.isPast === true;
+                  },
                   airbnb: (date) => {
                     const status = getDateStatus(date);
-                    return status?.bookedBy === 'airbnb';
+                    return status?.bookedBy === 'airbnb' && !status?.isPast;
                   },
                   booking: (date) => {
                     const status = getDateStatus(date);
-                    return status?.bookedBy === 'booking';
+                    return status?.bookedBy === 'booking' && !status?.isPast;
                   },
                   vrbo: (date) => {
                     const status = getDateStatus(date);
-                    return status?.bookedBy === 'vrbo';
+                    return status?.bookedBy === 'vrbo' && !status?.isPast;
                   },
                   blocked: (date) => {
                     const status = getDateStatus(date);
@@ -307,6 +316,7 @@ export default function ListingsManager() {
                   }
                 }}
                 modifiersClassNames={{
+                  pastBooking: 'bg-foreground/80 text-background hover:bg-foreground/70',
                   airbnb: 'bg-[#FF385C] text-white hover:bg-[#FF385C]/90',
                   booking: 'bg-[#003580] text-white hover:bg-[#003580]/90',
                   vrbo: 'bg-[#FFB400] text-black hover:bg-[#FFB400]/90',
